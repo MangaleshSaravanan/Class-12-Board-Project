@@ -141,7 +141,9 @@ def createAccount(password,name,dob,nationality,phnum,email,passport,
 def addMoney(acn, pwd, money):
     try:
         amount = Decimal(str(money))
-
+        if amount<=0:
+            print("Invalid amount entered.")
+            return
     except (ValueError, InvalidOperation):
         print("Invalid deposit amount format.")
         return
@@ -176,6 +178,9 @@ def addMoney(acn, pwd, money):
 def withdrawMoney(acn, pwd, money):
     try:
         amount = Decimal(str(money))
+        if amount<=0:
+            print("Invalid amount entered.")
+            return
 
     except (ValueError, InvalidOperation):
         print("Invalid withdrawal amount format.")
@@ -183,7 +188,11 @@ def withdrawMoney(acn, pwd, money):
 
     transaction_id = createTransactionId()
     fee = amount * Decimal("0.01")
-    tax = fee * Decimal("0.18")
+    if amount<100000: prc='0.15'
+    elif amount<1000000: prc='0.1'
+    elif amount<10000000: prc='0.05'
+    else: prc='0.01'
+    tax = fee * Decimal(prc)
     total_amount = round(amount + fee + tax, 2)
 
     try:
@@ -223,6 +232,9 @@ def transferMoney(acn, pwd, racn, money):
 
     try:
         amount = Decimal(str(money))
+        if amount<=0:
+            print("Invalid amount entered")
+            return
 
     except (ValueError, InvalidOperation):
         print("Invalid transfer amount format.")
@@ -249,8 +261,11 @@ def transferMoney(acn, pwd, racn, money):
             myConn.commit()
             return
 
-        fee = amount * Decimal("0.01")
-        tax = fee * Decimal("0.18")
+       if amount<100000: prc='0.15'
+        elif amount<1000000: prc='0.1'
+        elif amount<10000000: prc='0.05'
+        else: prc='0.01'
+        tax = fee * Decimal(prc)
         total_amount = round(amount + fee + tax, 2)
 
         if total_amount <= balance[0]:
@@ -302,8 +317,6 @@ def getBalance(acn, pwd):
         print(f"Unable to retrieve balance.\nReason: {err}")
 
 def getTransactions(acn, pwd):
-    headings = ("Transaction ID","Customer ID","Type","Amount","Sender","Receiver","Date & Time","Status","Fees","Tax")
-    print(headings)
     print("-" * 150)
 
     try:
@@ -314,10 +327,10 @@ def getTransactions(acn, pwd):
             print("Invalid account number.")
             return
 
-        if pwd != row[0]:
+        elif pwd != row[0]:
             print("Invalid password.")
             return
-
+            
         myCur.execute("""SELECT * FROM __bankTransactions__ WHERE sender_account=%s OR receiver_account=%s
             ORDER BY transaction_date DESC""",(acn, acn))
         transactions = myCur.fetchall()
@@ -332,6 +345,9 @@ def getTransactions(acn, pwd):
             transaction[6] = str(transaction[6])
             transaction[8] = float(transaction[8]) if transaction[8] else 0.0
             transaction[9] = float(transaction[9]) if transaction[9] else 0.0
+            headings = ("Transaction ID","Customer ID","Type","Amount","Sender","Receiver",
+                        "Date & Time","Status","Fees","Tax")
+            print(headings)
             print(tuple(transaction))
 
     except mysql.connector.Error as err:
