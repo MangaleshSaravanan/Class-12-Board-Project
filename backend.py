@@ -121,7 +121,7 @@ def createAccount(password,name,dob,nationality,phnum,email,passport,
         return
     status = "ACTIVE"
     try:
-        query = """INSERT INTO __bankCustomers__VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,
+        query = """INSERT INTO __bankCustomers__ VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,
                 %s,%s,%s,%s,%s,%s,%s,%s,0)"""
 
         values = (customer_id,account_number,password,name,dob,nationality,phnum,email,
@@ -158,7 +158,7 @@ def addMoney(acn, pwd, money):
             return
 
         customer_id = result[0]
-        myCur.execute("""UPDATE __bankCustomers__SET balance = balance + %sWHERE account_number=%sAND password=%s""",(amount, acn, pwd))
+        myCur.execute("""UPDATE __bankCustomers__ SET balance = balance + %s WHERE account_number=%s AND password=%s""",(amount, acn, pwd))
 
         if myCur.rowcount == 0:
             print("Invalid account number or password")
@@ -260,8 +260,8 @@ def transferMoney(acn, pwd, racn, money):
                 (transaction_id,customer[0],amount,acn,racn,datetime.now(),"FAILED"))
             myConn.commit()
             return
-
-       if amount<100000: prc='0.15'
+        fee = amount * Decimal("0.01")
+        if amount<100000: prc='0.15'
         elif amount<1000000: prc='0.1'
         elif amount<10000000: prc='0.05'
         else: prc='0.01'
