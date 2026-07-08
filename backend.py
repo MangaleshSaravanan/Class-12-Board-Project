@@ -345,10 +345,10 @@ def getTransactions(acn, pwd):
             transaction[6] = str(transaction[6])
             transaction[8] = float(transaction[8]) if transaction[8] else 0.0
             transaction[9] = float(transaction[9]) if transaction[9] else 0.0
-            headings = ("Transaction ID","Customer ID","Type","Amount","Sender","Receiver",
+        headings = ("Transaction ID","Customer ID","Type","Amount","Sender","Receiver",
                         "Date & Time","Status","Fees","Tax")
-            print(headings)
-            print(tuple(transaction))
+        print(headings)
+        print(tuple(transaction))
 
     except mysql.connector.Error as err:
         print(f"Unable to fetch transaction history.\nReason: {err}")
